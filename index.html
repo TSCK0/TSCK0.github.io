@@ -1,0 +1,814 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Portfolio of T S Charan Kharthik, embedded systems engineer: FSK modem, production test automation, sensor hardware and a swirl injector.">
+<title>T S Charan Kharthik</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Condensed:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: a bench-notebook portfolio. Each project sits beside a date and organisation rail, newest first, with one amber signal colour on a blue-slate ground. The one bold moment is the scrolling FSK trace under the name. */
+:root {
+  --bg: #0b1015;
+  --surface: #111921;
+  --surface-2: #18222d;
+  --line: #202c38;
+  --line-strong: #344759;
+  --fg: #e9eef3;
+  --muted: #9aa8b6;
+  --faint: #8493a1;
+  --accent: #f2b04a;
+  --accent-ink: #1b1305;
+  --accent-dim: #92702f;
+  --paper: #eceff2;
+  --paper-ink: #1b232b;
+  --focus: #8fd3ff;
+  --font-display: "IBM Plex Sans Condensed", "Arial Narrow", system-ui, sans-serif;
+  --font-body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+  color-scheme: dark;
+}
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font: 400 1rem/1.6 var(--font-body);
+  padding-block: 0 4rem;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  -webkit-font-smoothing: antialiased;
+}
+body::before {
+  content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px);
+  background: var(--bg); z-index: 10;
+}
+.wrap { max-width: 1120px; margin-inline: auto; }
+a { color: inherit; }
+a:focus-visible, button:focus-visible, video:focus-visible { outline: 2px solid var(--focus); outline-offset: 3px; }
+h1, h2, h3 { text-wrap: balance; }
+
+/* Top bar */
+.top {
+  position: sticky; top: env(safe-area-inset-top, 0px); z-index: 9;
+  background: var(--bg); border-bottom: 1px solid var(--line);
+}
+.top .wrap { display: flex; align-items: center; justify-content: space-between; gap: 1rem; min-height: 56px; }
+.mark { font: 600 1.05rem/1 var(--font-display); letter-spacing: .02em; text-decoration: none; }
+.nav { display: flex; align-items: center; gap: 1.5rem; font-size: .92rem; }
+.nav a { text-decoration: none; color: var(--muted); }
+.nav a:hover { color: var(--fg); }
+.nav .pill { color: var(--accent); border: 1px solid var(--accent-dim); padding: .35rem .8rem; border-radius: 2px; }
+.nav .pill:hover { color: var(--accent-ink); background: var(--accent); border-color: var(--accent); }
+@media (max-width: 560px) { .nav a:not(.pill) { display: none; } }
+
+/* Hero */
+.hero { padding-top: clamp(2.5rem, 7vw, 5rem); }
+h1 { font: 600 clamp(2.7rem, 8vw, 5.4rem)/1 var(--font-display); letter-spacing: -.01em; margin: 0 0 1rem; }
+.role { font: 500 1.1rem/1.4 var(--font-mono); color: var(--accent); margin: 0 0 1.5rem; }
+.summary { font-size: clamp(1.1rem, 2vw, 1.3rem); line-height: 1.55; max-width: 46rem; margin: 0 0 2rem; color: var(--fg); }
+.summary span { color: var(--muted); }
+.actions { display: flex; flex-wrap: wrap; gap: .75rem; margin-bottom: 3rem; }
+.btn {
+  display: inline-flex; align-items: center; min-height: 44px; padding: 0 1.15rem;
+  border: 1px solid var(--line-strong); border-radius: 2px; background: transparent; color: var(--fg);
+  font: 500 .95rem var(--font-body); text-decoration: none; cursor: pointer;
+}
+.btn:hover { border-color: var(--accent); color: var(--accent); }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.btn.primary:hover { background: #ffc566; border-color: #ffc566; color: var(--accent-ink); }
+
+.scope { margin: 0 0 2.5rem; }
+.scope canvas {
+  display: block; width: 100%; height: 136px;
+  border-block: 1px solid var(--line);
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+}
+.scope figcaption { font-size: .82rem; color: var(--faint); margin-top: .6rem; }
+
+.glance { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr)); gap: 1.25rem 2.5rem; margin: 0; }
+.glance dt { font-size: .85rem; color: var(--muted); }
+.glance dd { margin: .15rem 0 0; }
+
+/* Sections */
+section { scroll-margin-top: 72px; }
+.section-head { padding-top: 5rem; }
+h2 { font: 600 clamp(1.9rem, 4vw, 2.8rem)/1.1 var(--font-display); margin: 0 0 .75rem; }
+.section-head p { color: var(--muted); max-width: 52ch; margin: 0 0 2rem; }
+
+/* Projects */
+.project {
+  display: grid; grid-template-columns: minmax(0, 190px) minmax(0, 1fr); column-gap: 3rem;
+  padding-block: 3rem; border-top: 1px solid var(--line);
+}
+.rail { display: flex; flex-direction: column; gap: .15rem; font-size: .92rem; color: var(--muted); align-self: start; }
+.rail .when { font: 500 .85rem/1.4 var(--font-mono); color: var(--accent); margin-bottom: .35rem; }
+.rail b { color: var(--fg); font-weight: 500; }
+.project h3 { font: 600 clamp(1.7rem, 3.6vw, 2.4rem)/1.1 var(--font-display); margin: 0 0 .9rem; }
+.lede { font-size: 1.125rem; max-width: 62ch; margin: 0 0 1.5rem; }
+.did { list-style: none; padding: 0; margin: 0 0 1.75rem; display: grid; gap: .65rem; max-width: 68ch; }
+.did li { position: relative; padding-left: 1.2rem; color: var(--muted); }
+.did li::before { content: ""; position: absolute; left: 0; top: .8em; width: .55rem; height: 1px; background: var(--accent-dim); }
+.did strong { color: var(--fg); font-weight: 500; }
+
+.metrics {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1px;
+  background: var(--line); border: 1px solid var(--line); margin: 0 0 2rem;
+}
+.metrics > div { background: var(--surface); padding: 1rem 1.1rem; display: flex; flex-direction: column-reverse; justify-content: flex-end; gap: .3rem; }
+.metrics dd { margin: 0; font: 500 1.6rem/1.1 var(--font-mono); color: var(--accent); font-variant-numeric: tabular-nums; }
+.metrics dt { font-size: .82rem; line-height: 1.35; color: var(--muted); }
+
+.tags { display: flex; flex-wrap: wrap; gap: .4rem; list-style: none; padding: 0; margin: 1.5rem 0 0; }
+.tags li { font: 400 .78rem var(--font-mono); color: var(--muted); border: 1px solid var(--line); padding: .2rem .55rem; }
+
+/* Block diagrams */
+.diagram { margin: 0; display: grid; gap: 1.4rem; padding: 1.25rem; background: var(--surface); border: 1px solid var(--line); }
+.flow-label { font-size: .82rem; color: var(--faint); margin: 0 0 .5rem; }
+.flow { display: flex; align-items: stretch; }
+.node {
+  flex: 1 1 0; min-width: 0; padding: .7rem .8rem; border: 1px solid var(--line-strong); background: var(--surface-2);
+  font-size: .88rem; line-height: 1.3; display: flex; flex-direction: column; justify-content: center; gap: .2rem;
+}
+.node small { font: 400 .74rem/1.3 var(--font-mono); color: var(--muted); }
+.node.open { border-style: dashed; background: transparent; }
+.node.end { border-color: var(--accent-dim); }
+.wire { flex: 0 0 26px; align-self: center; height: 1px; background: var(--accent-dim); position: relative; }
+.wire::after { content: ""; position: absolute; right: -1px; top: -3px; border-left: 6px solid var(--accent-dim); border-block: 3.5px solid transparent; }
+.diagram figcaption { font-size: .8rem; color: var(--faint); }
+@media (max-width: 760px) {
+  .flow { flex-direction: column; }
+  .wire { flex: 0 0 22px; width: 1px; height: 22px; align-self: center; }
+  .wire::after { right: auto; left: -3px; top: auto; bottom: -1px; border-left: 3.5px solid transparent; border-right: 3.5px solid transparent; border-top: 6px solid var(--accent-dim); border-bottom: 0; }
+}
+
+/* Media */
+.stack { display: grid; gap: 2rem; }
+.shot { margin: 0; }
+.shot img, .shot video { display: block; width: 100%; height: auto; border: 1px solid var(--line); background: #000; }
+.shot video { aspect-ratio: 1280 / 534; }
+.shot figcaption { font-size: .84rem; color: var(--faint); margin-top: .55rem; max-width: 62ch; }
+.pair { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: 1rem; }
+.paper { margin: 0; }
+.paper .sheet { background: var(--paper); border: 1px solid var(--line-strong); padding: .75rem; display: grid; place-items: center; min-height: 220px; }
+.paper img { display: block; max-width: 100%; height: auto; max-height: 300px; width: auto; }
+.paper figcaption { font-size: .84rem; color: var(--faint); margin-top: .55rem; }
+.trio { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem; }
+@media (max-width: 860px) { .trio { grid-template-columns: minmax(0, 1fr); } }
+.split { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 1.5rem; align-items: start; }
+@media (max-width: 860px) { .split { grid-template-columns: minmax(0, 1fr); } }
+.note { font-size: .84rem; color: var(--faint); margin: .75rem 0 0; max-width: 62ch; }
+
+.tablewrap { overflow-x: auto; border: 1px solid var(--line); background: var(--surface); }
+table { border-collapse: collapse; width: 100%; font-size: .9rem; }
+caption { text-align: left; padding: .75rem .9rem; font-size: .84rem; color: var(--muted); border-bottom: 1px solid var(--line); }
+th, td { padding: .6rem .9rem; text-align: left; border-bottom: 1px solid var(--line); font-variant-numeric: tabular-nums; }
+tbody tr:last-child > * { border-bottom: 0; }
+thead th { color: var(--muted); font-weight: 500; }
+tbody th { font-weight: 400; color: var(--muted); }
+td { font-family: var(--font-mono); font-size: .86rem; }
+
+.steps { list-style: none; counter-reset: step; padding: 0; margin: 0 0 2rem; display: grid; gap: .8rem; max-width: 70ch; }
+.steps li { counter-increment: step; display: grid; grid-template-columns: 2rem 1fr; gap: .5rem; color: var(--muted); }
+.steps li::before { content: counter(step); font: 500 .85rem/1.9 var(--font-mono); color: var(--accent); }
+.steps strong { color: var(--fg); font-weight: 500; }
+.subhead { font: 600 1.15rem/1.2 var(--font-display); margin: 2.25rem 0 .9rem; }
+
+
+/* 3D viewer */
+.viewer { margin: 0 0 2rem; }
+.viewer-stage { position: relative; height: clamp(320px, 50vw, 520px); background: var(--surface); border: 1px solid var(--line); overflow: hidden; }
+.viewer-stage canvas, .viewer-fallback { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.viewer-fallback { object-fit: contain; }
+.viewer.ready .viewer-fallback { display: none; }
+.viewer.nogl canvas { display: none; }
+.viewer-hint { position: absolute; left: .85rem; bottom: .65rem; margin: 0; font-size: .8rem; color: var(--faint); pointer-events: none; }
+.viewer-bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .75rem; margin-top: .75rem; }
+.viewer:not(.ready) .viewer-bar { visibility: hidden; }
+.viewer.nogl .viewer-bar { display: none; }
+.viewer figcaption { font-size: .84rem; color: var(--faint); margin-top: .75rem; max-width: 66ch; }
+.seg { display: inline-flex; border: 1px solid var(--line-strong); border-radius: 2px; overflow: hidden; }
+.seg button { min-height: 40px; padding: 0 1.1rem; border: 0; background: transparent; color: var(--muted); font: 500 .9rem var(--font-body); cursor: pointer; }
+.seg button + button { border-left: 1px solid var(--line-strong); }
+.seg button:hover { color: var(--fg); }
+.seg button[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); }
+.btn.small { min-height: 40px; font-size: .9rem; }
+.tablewrap.narrow { max-width: 780px; }
+
+/* Skills, background, contact */
+.skills { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 270px), 1fr)); gap: 1.5rem 2.5rem; margin: 0; border-top: 1px solid var(--line); padding-top: 2rem; }
+.skills dt { font-size: .85rem; color: var(--muted); }
+.skills dd { margin: .15rem 0 0; }
+.bg-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr)); gap: 2rem 3rem; border-top: 1px solid var(--line); padding-top: 2rem; }
+.bg-grid h3 { font: 600 1.15rem/1.2 var(--font-display); margin: 0 0 .5rem; }
+.bg-grid p { margin: 0 0 .5rem; color: var(--muted); max-width: 58ch; }
+.bg-grid p b { color: var(--fg); font-weight: 500; }
+.contact { border-top: 1px solid var(--line); margin-top: 5rem; padding-top: 3rem; }
+.contact h2 { font-size: clamp(2rem, 5vw, 3.4rem); }
+.email-line { display: flex; flex-wrap: wrap; align-items: center; gap: .75rem 1rem; margin: 0 0 1.5rem; }
+.email-line code { font: 500 clamp(1rem, 3vw, 1.35rem) var(--font-mono); color: var(--fg); overflow-wrap: anywhere; user-select: all; }
+.status { min-height: 1.4em; font-size: .85rem; color: var(--muted); margin: -.5rem 0 1rem; }
+.fine { font-size: .84rem; color: var(--faint); }
+
+@media (max-width: 860px) {
+  .project { grid-template-columns: minmax(0, 1fr); row-gap: 1.25rem; }
+  .rail { flex-direction: row; flex-wrap: wrap; gap: .25rem 1rem; align-items: baseline; }
+  .rail .when { margin-bottom: 0; }
+}
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } * { transition: none !important; } }
+</style>
+
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <a class="mark" href="#top">T S Charan Kharthik</a>
+    <nav class="nav" aria-label="Sections">
+      <a href="#work">Work</a>
+      <a href="#skills">Skills</a>
+      <a href="#contact">Contact</a>
+      <a class="pill" href="media/T_S_Charan_Kharthik_Resume.pdf" target="_blank" rel="noopener">Resume</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+<section class="hero" id="top">
+  <div class="wrap">
+    <h1>T S Charan Kharthik</h1>
+    <p class="role">Embedded systems engineer</p>
+    <p class="summary">Mechanical-engineering-trained embedded systems engineer combining firmware, sensor integration and fluid-flow analysis to build and validate connected hardware products. <span>Experience spans a long-range FSK modem, multi-sensor monitoring hardware and automated production-test rigs.</span></p>
+    <div class="actions">
+      <a class="btn primary" href="media/T_S_Charan_Kharthik_Resume.pdf" target="_blank" rel="noopener">Resume (PDF)</a>
+      <a class="btn" href="https://www.linkedin.com/in/tsck/" target="_blank" rel="noopener">LinkedIn</a>
+      <a class="btn" href="#contact">Email</a>
+    </div>
+
+    <figure class="scope">
+      <canvas id="fsk" aria-hidden="true"></canvas>
+      <figcaption>Frequency-shift keying: two tones carry one bit stream. This is the signal the modem at Enwire Auto sends over long-range wire.</figcaption>
+    </figure>
+
+    <dl class="glance">
+      <div><dt>Now</dt><dd>Embedded Systems Engineer, Enwire Auto</dd></div>
+      <div><dt>Education</dt><dd>B.E. Mechanical Engineering, Dayananda Sagar College of Engineering, 2025</dd></div>
+      <div><dt>Based in</dt><dd>Bangalore, open to relocation in India and abroad</dd></div>
+    </dl>
+  </div>
+</section>
+
+<section id="work">
+  <div class="wrap">
+    <div class="section-head">
+      <h2>Selected work</h2>
+      <p>Newest first. Block diagrams for employer and internship projects are generic and leave out proprietary detail.</p>
+    </div>
+
+    <!-- Enwire -->
+    <article class="project" id="enwire">
+      <div class="rail">
+        <span class="when">Aug 2025 – now</span>
+        <b>Enwire Auto</b>
+        <span>Bangalore</span>
+        <span>Embedded Systems Engineer</span>
+      </div>
+      <div>
+        <h3>FSK modem for long-range wire</h3>
+        <p class="lede">Firmware, signal processing and testing for a modem that sends message frames over long-range wire.</p>
+        <ul class="did">
+          <li><strong>Wrote the firmware and signal processing</strong> and tested the modem end to end.</li>
+          <li>Held signal loss under 5% on long-range wire.</li>
+          <li>Worked to ASPICE SWE.4 (software unit verification) and SWE.5 (software integration test).</li>
+          <li>Built a project-specific, ASPICE-based test process that follows the development lifecycle of the organisation's products.</li>
+        </ul>
+        <dl class="metrics">
+          <div><dt>signal loss over long-range wire</dt><dd>&lt; 5%</dd></div>
+          <div><dt>ASPICE processes followed</dt><dd>SWE.4 + 5</dd></div>
+        </dl>
+        <figure class="diagram" role="group" aria-label="Generic block diagram of an FSK modem signal path and its verification steps">
+          <div>
+            <p class="flow-label">Signal path</p>
+            <div class="flow">
+              <div class="node">Message frame</div><span class="wire"></span>
+              <div class="node">Framing and encoding<small>firmware</small></div><span class="wire"></span>
+              <div class="node">FSK modulation</div><span class="wire"></span>
+              <div class="node open">Long-range wire</div><span class="wire"></span>
+              <div class="node">Signal processing<small>receive side</small></div><span class="wire"></span>
+              <div class="node">FSK demodulation</div><span class="wire"></span>
+              <div class="node end">Frame recovered</div>
+            </div>
+          </div>
+          <div>
+            <p class="flow-label">Verification</p>
+            <div class="flow">
+              <div class="node">Unit verification<small>ASPICE SWE.4</small></div><span class="wire"></span>
+              <div class="node">Integration test<small>ASPICE SWE.5</small></div><span class="wire"></span>
+              <div class="node end">Signal loss under 5%</div>
+            </div>
+          </div>
+          <figcaption>Generic block diagram. No proprietary detail.</figcaption>
+        </figure>
+        <ul class="tags"><li>Embedded C</li><li>FSK</li><li>Signal processing</li><li>ASPICE SWE.4</li><li>ASPICE SWE.5</li></ul>
+      </div>
+    </article>
+
+    <!-- Synedyne -->
+    <article class="project" id="synedyne">
+      <div class="rail">
+        <span class="when">Feb – Aug 2025</span>
+        <b>Synedyne Systems</b>
+        <span>Intern, PMO</span>
+      </div>
+      <div>
+        <h3>Production-line test automation</h3>
+        <p class="lede">Five tools that replaced manual testing, labelling and dispatch checks on a line building 3,000 units a month.</p>
+        <ul class="did">
+          <li><strong>Test rig.</strong> LabVIEW and J-Scope over a J-Link debug probe, with one pass/fail output, replaced button-by-button manual testing.</li>
+          <li><strong>Dispatch check.</strong> Tracks WIP serial numbers and test status, and blocks untested or failed units from leaving the line.</li>
+          <li><strong>Keystroke validation.</strong> Tests an instrument cluster over RS485 from LabVIEW, 300+ units a month.</li>
+          <li><strong>Label printing.</strong> Over RS232, the unit ID is generated at the final workstation only after a unit passes, which replaced manual serial entry.</li>
+          <li><strong>Stores labels.</strong> A Python app fetches SAP data against a supplier serial or invoice number and prints the label, replacing manual label creation.</li>
+        </ul>
+        <dl class="metrics">
+          <div><dt>per unit tested, down from about 3 minutes (about 80% less)</dt><dd>35 s</dd></div>
+          <div><dt>fewer failed boards dispatched, from 20+ a month</dt><dd>95%</dd></div>
+          <div><dt>of duplicate serial numbers eliminated</dt><dd>100%</dd></div>
+          <div><dt>for stores to log an item, across 1000+ pieces a month</dt><dd>~15 s</dd></div>
+        </dl>
+        <figure class="diagram" role="group" aria-label="Generic block diagram of an automated production test line with label printing and dispatch check">
+          <div>
+            <p class="flow-label">Line flow</p>
+            <div class="flow">
+              <div class="node">Board under test</div><span class="wire"></span>
+              <div class="node">Automated test rig<small>LabVIEW, J-Scope, J-Link</small></div><span class="wire"></span>
+              <div class="node">Pass / fail output</div><span class="wire"></span>
+              <div class="node">Label printing<small>unit ID on pass only, RS232</small></div><span class="wire"></span>
+              <div class="node end">Dispatch check<small>blocks untested or failed units</small></div>
+            </div>
+          </div>
+          <div>
+            <p class="flow-label">Alongside the line</p>
+            <div class="flow">
+              <div class="node">Instrument cluster<small>keystroke validation, RS485</small></div><span class="wire"></span>
+              <div class="node">Supplier serial or invoice number</div><span class="wire"></span>
+              <div class="node">Python app<small>SAP data fetch</small></div><span class="wire"></span>
+              <div class="node end">Stores label</div>
+            </div>
+          </div>
+          <figcaption>Generic block diagram. No proprietary detail.</figcaption>
+        </figure>
+        <ul class="tags"><li>LabVIEW</li><li>J-Link</li><li>J-Scope</li><li>RS485</li><li>RS232</li><li>Python</li><li>SAP</li></ul>
+      </div>
+    </article>
+
+    <!-- DCX -->
+    <article class="project" id="dcx">
+      <div class="rail">
+        <span class="when">Oct – Nov 2023</span>
+        <b>DCX Systems</b>
+        <span>Intern, Production Engineering</span>
+      </div>
+      <div>
+        <h3>Part-lookup automation for procurement</h3>
+        <p class="lede">A Python tool that gives production a ready list of vendors, prices and lead times for each part.</p>
+        <ul class="did">
+          <li>Used a PDF reader module and a web scraper to automate part lookups.</li>
+          <li>Replaced a manual procurement process that took 10 minutes to an hour per part.</li>
+        </ul>
+        <dl class="metrics">
+          <div><dt>per part, down from 10 minutes to an hour</dt><dd>~2 min</dd></div>
+        </dl>
+        <figure class="diagram" role="group" aria-label="Generic block diagram of an automated part lookup">
+          <div class="flow">
+            <div class="node">Part details<small>from PDF</small></div><span class="wire"></span>
+            <div class="node">PDF reader module</div><span class="wire"></span>
+            <div class="node">Web scraper</div><span class="wire"></span>
+            <div class="node end">Vendor list<small>price and lead time per part</small></div>
+          </div>
+          <figcaption>Generic block diagram. No proprietary detail.</figcaption>
+        </figure>
+        <ul class="tags"><li>Python</li><li>Web scraping</li><li>PDF parsing</li></ul>
+      </div>
+    </article>
+
+    <!-- SIH -->
+    <article class="project" id="sih">
+      <div class="rail">
+        <span class="when">Smart India Hackathon</span>
+        <b>Team of 5</b>
+        <span>Hardware and firmware</span>
+      </div>
+      <div>
+        <h3>Tyre pressure and TKPH monitor for dumper trucks</h3>
+        <p class="lede">Coal dumper tyres had no health monitoring and TKPH was tracked by hand. This sensor module and app does both, live.</p>
+        <ul class="did">
+          <li><strong>Built the hardware and firmware.</strong> An Arduino-based module with an IR temperature sensor, a 1.8 MPa pressure transducer, a load cell, a camera and a Bluetooth link.</li>
+          <li>The app calculates TKPH live for every load and unload cycle.</li>
+          <li>Tyre health metrics and live tyre photos refresh every 5 seconds.</li>
+          <li>Pressure and temperature charts and a low-pressure alert run in the app.</li>
+        </ul>
+        <dl class="metrics">
+          <div><dt>refresh for tyre health metrics and photos</dt><dd>5 s</dd></div>
+          <div><dt>pressure transducer</dt><dd>1.8 MPa</dd></div>
+          <div><dt>people on the team</dt><dd>5</dd></div>
+        </dl>
+        <div class="stack">
+          <figure class="shot">
+            <video controls preload="metadata" playsinline poster="media/sih-poster.jpg" aria-label="Demo of the tyre monitor prototype and its app">
+              <source src="media/sih-demo.mp4" type="video/mp4">
+            </video>
+            <figcaption>Prototype demo, 1 minute 31 seconds: the sensor module on a tyre, live pressure and temperature charts, and the TKPH calculator.</figcaption>
+          </figure>
+          <div class="pair">
+            <figure class="shot">
+              <img src="media/sih-bench.jpg" width="1280" height="534" loading="lazy" alt="Test bench with an Arduino breadboard and pressure transducer on a tyre, next to the app's pressure and temperature charts">
+              <figcaption>Test bench: Arduino breadboard and pressure transducer on a tyre, with the app's live charts beside it.</figcaption>
+            </figure>
+            <figure class="shot">
+              <img src="media/sih-tkph.jpg" width="1280" height="534" loading="lazy" alt="TKPH calculator in the app showing the formula and per-tyre results">
+              <figcaption>TKPH calculator: inputs, the formula with its ambient-temperature correction, and per-tyre results.</figcaption>
+            </figure>
+          </div>
+        </div>
+        <p class="note">TKPH (tonne-kilometres per hour) rates how much work a tyre can do before it overheats.</p>
+        <ul class="tags"><li>Arduino</li><li>Bluetooth</li><li>IR temperature</li><li>Pressure transducer</li><li>Load cell</li><li>Mobile app</li></ul>
+      </div>
+    </article>
+
+    <!-- Garuda -->
+    <article class="project" id="garuda">
+      <div class="rail">
+        <span class="when">2022 – 2023</span>
+        <b>Vega Aerospace</b>
+        <span>Student team, Garuda Mark 1</span>
+      </div>
+      <div>
+        <h3>Garuda Mark 1: coaxial swirl injector</h3>
+        <p class="lede">Garuda Mark 1 is a pressure-fed liquid bipropellant engine, gaseous oxygen and ethanol, designed for 400 N of thrust. I worked on the injector design and analysis, and on the electronics and test stand.</p>
+        <dl class="metrics">
+          <div><dt>design thrust</dt><dd>400 N</dd></div>
+          <div><dt>chamber pressure</dt><dd>10 bar</dd></div>
+          <div><dt>oxidiser to fuel ratio</dt><dd>1.0</dd></div>
+          <div><dt>design iterations to reach the target discharge coefficient and pressure drop</dt><dd>3</dd></div>
+        </dl>
+
+        <h4 class="subhead">How the numbers were reached</h4>
+        <ol class="steps">
+          <li><span><strong>Mission.</strong> A 5 kg payload to 5 km with a maximum wet mass of 30 kg gave a velocity requirement of 575.4 m/s, including a 1.3 factor for drag and other losses.</span></li>
+          <li><span><strong>Propellants.</strong> Gaseous oxygen and ethanol, chosen for cost, handling and availability.</span></li>
+          <li><span><strong>Combustion analysis.</strong> A NASA CEA sweep over chamber pressures of 3 to 10 bar and ratios of 0.5 to 2 settled on 10 bar and 1.0.</span></li>
+          <li><span><strong>Thrust.</strong> 400 N gives a thrust-to-weight ratio of 1.6 for a conservative 25 kg rocket.</span></li>
+          <li><span><strong>Injector.</strong> Orifice areas from Huzel and Huang, then swirl chamber geometry following Xue, Jog and Jeng (AIAA Journal, 2004).</span></li>
+          <li><span><strong>Iteration.</strong> Three CAD versions in OnShape and Fusion 360, with fluid flow simulated in SimScale.</span></li>
+        </ol>
+
+        <h4 class="subhead">Injector fluid model</h4>
+        <figure class="viewer" id="viewer">
+          <div class="viewer-stage">
+            <img class="viewer-fallback" src="media/injector-domain.png" width="1200" height="709" alt="Still render of the injector fluid domain: a small injector region with four horizontal inlet pipes on top of a large cylindrical domain">
+            <canvas id="inj3d" role="img" aria-label="Interactive 3D model of the injector fluid domain. Drag to rotate, scroll or pinch to zoom."></canvas>
+            <p class="viewer-hint" id="viewer-hint">Loading the 3D model.</p>
+          </div>
+          <div class="viewer-bar">
+            <div class="seg" role="group" aria-label="View">
+              <button type="button" aria-pressed="true" data-view="injector">Injector</button>
+              <button type="button" aria-pressed="false" data-view="domain">Full domain</button>
+            </div>
+            <button type="button" class="btn small" id="viewer-reset">Reset view</button>
+          </div>
+          <figcaption>Simulation fluid domain for design version 2 (double holes). The injector's internal fluid volume is solid, and the surrounding domain is the faint shell, about 204 mm across.</figcaption>
+        </figure>
+
+        <div class="tablewrap narrow">
+              <table>
+                <caption>Design values for the two stages</caption>
+                <thead><tr><th scope="col">Parameter</th><th scope="col">Oxidiser (O<sub>2</sub>)</th><th scope="col">Fuel (ethanol)</th></tr></thead>
+                <tbody>
+                  <tr><th scope="row">Orifice area</th><td>47.93 mm²</td><td>35.36 mm²</td></tr>
+                  <tr><th scope="row">Discharge coefficient (assumed)</th><td>0.666</td><td>0.666</td></tr>
+                  <tr><th scope="row">Air-core area ratio</th><td>0.258</td><td>0.258</td></tr>
+                  <tr><th scope="row">Film thickness</th><td>1.92 mm</td><td>3.13 mm</td></tr>
+                  <tr><th scope="row">Orifice length and diameter</th><td>8 mm</td><td>12.72 mm</td></tr>
+                  <tr><th scope="row">Spin chamber length and diameter</th><td>20 mm</td><td>40 mm</td></tr>
+                  <tr><th scope="row">Inlet slot angle</th><td>120°</td><td>120°</td></tr>
+                </tbody>
+              </table>
+        </div>
+
+        <h4 class="subhead">Three design versions</h4>
+        <div class="trio">
+          <figure class="paper"><div class="sheet"><img src="media/injector-v1.jpg" width="582" height="585" loading="lazy" alt="CAD views of injector design version 1: renders, section view and dimensioned drawing"></div><figcaption>Version 1</figcaption></figure>
+          <figure class="paper"><div class="sheet"><img src="media/injector-v2.jpg" width="1077" height="834" loading="lazy" alt="CAD views of injector design version 2: renders, section view and dimensioned drawing"></div><figcaption>Version 2</figcaption></figure>
+          <figure class="paper"><div class="sheet"><img src="media/injector-v3.jpg" width="1153" height="961" loading="lazy" alt="CAD views of injector design version 3: renders, section view and dimensioned drawing"></div><figcaption>Version 3</figcaption></figure>
+        </div>
+
+        <h4 class="subhead">Chamber geometry</h4>
+        <div class="pair">
+          <figure class="paper"><div class="sheet"><img src="media/chamber-oxidiser.png" width="417" height="532" loading="lazy" alt="Dimensioned drawing of the oxidiser chamber: 20 mm by 20 mm, 8 mm orifice, 120 degree cone"></div><figcaption>Oxidiser chamber: 20 mm spin chamber, 8 mm orifice, 120° cone.</figcaption></figure>
+          <figure class="paper"><div class="sheet"><img src="media/chamber-fuel.jpg" width="283" height="311" loading="lazy" alt="Dimensioned drawing of the fuel chamber: 40 mm by 40 mm, 12.7 mm orifice, 120 degree cone"></div><figcaption>Fuel chamber: 40 mm spin chamber, 12.7 mm orifice, 120° cone. Not drawn to the same scale as the oxidiser chamber.</figcaption></figure>
+        </div>
+        <ul class="tags"><li>NASA CEA</li><li>OnShape</li><li>Fusion 360</li><li>SimScale (CFD)</li><li>Fluid mechanics</li></ul>
+      </div>
+    </article>
+  </div>
+</section>
+
+<section id="skills">
+  <div class="wrap">
+    <div class="section-head" style="padding-top:3rem">
+      <h2>Skills</h2>
+    </div>
+    <dl class="skills">
+      <div><dt>Languages</dt><dd>Python, Embedded C</dd></div>
+      <div><dt>Microcontrollers and hardware</dt><dd>STM32, Arduino, Raspberry Pi, PSoC</dd></div>
+      <div><dt>Sensor interfacing</dt><dd>IR temperature, pressure transducer, load cell</dd></div>
+      <div><dt>Protocols</dt><dd>RS232, RS485, UART, SPI, Bluetooth</dd></div>
+      <div><dt>Tools</dt><dd>STM32CubeIDE, LabVIEW, J-Link and J-Scope, SimScale (CFD), OnShape, Fusion 360</dd></div>
+      <div><dt>Standards and process</dt><dd>ASPICE SWE.4, SWE.5</dd></div>
+      <div><dt>Domains</dt><dd>Embedded systems, IIoT, automation, firmware development, fluid flow analysis</dd></div>
+    </dl>
+  </div>
+</section>
+
+<section id="background">
+  <div class="wrap">
+    <div class="section-head" style="padding-top:4rem"><h2>Background</h2></div>
+    <div class="bg-grid">
+      <div>
+        <h3>Education</h3>
+        <p><b>B.E. Mechanical Engineering</b>, Dayananda Sagar College of Engineering, graduated 2025. CGPA 7.83.</p>
+        <p>Coursework: Automation and Control Systems, Mechatronics, Fluid Mechanics, Manufacturing Technology.</p>
+      </div>
+      <div>
+        <h3>Leadership</h3>
+        <p><b>Head of the MUN Society</b>, Literary Society, DSCE, for one year. Led a team of 30 and raised the yearly average of wins from 8 to 35.</p>
+        <p>Director General of DSIMUN (120+ delegates, 5 committees, staff of 25). Led the team to the society's first delegation trophy at ROTAMUN 2024.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="contact" id="contact">
+  <div class="wrap">
+    <h2>Contact</h2>
+    <p class="email-line"><code id="email-text">tscharankharthik@gmail.com</code><button class="btn" id="copy-email" type="button">Copy email</button></p>
+    <p class="status" id="copy-msg" role="status" aria-live="polite"></p>
+    <div class="actions" style="margin-bottom:1.5rem">
+      <a class="btn primary" href="mailto:tscharankharthik@gmail.com">Write an email</a>
+      <a class="btn" href="https://www.linkedin.com/in/tsck/" target="_blank" rel="noopener">LinkedIn</a>
+      <a class="btn" href="media/T_S_Charan_Kharthik_Resume.pdf" target="_blank" rel="noopener">Resume (PDF)</a>
+    </div>
+    <p class="fine">Bangalore, India. Open to relocation in India and abroad.</p>
+  </div>
+</section>
+</main>
+
+<script>
+(function () {
+  /* Scrolling FSK trace */
+  var cv = document.getElementById('fsk');
+  if (cv && cv.getContext) {
+    var ctx = cv.getContext('2d');
+    var bits = [1,0,1,1,0,0,1,0,1,0,0,1,1,1,0,1];
+    var n = bits.length, bitPx = 96;
+    var per = function (b) { return b ? 16 : 32; };
+    var prefix = [0];
+    for (var i = 0; i < n; i++) prefix.push(prefix[i] + 2 * Math.PI * bitPx / per(bits[i]));
+    var P = prefix[n];
+    function phaseAt(xa) {
+      var k = Math.floor(xa / bitPx), kk = ((k % n) + n) % n, cyc = Math.floor(k / n);
+      return cyc * P + prefix[kk] + 2 * Math.PI * (xa - k * bitPx) / per(bits[kk]);
+    }
+    var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var W = 0, H = 0, off = 0, last = 0, raf = 0, visible = true;
+    var css = function (name) { return getComputedStyle(document.documentElement).getPropertyValue(name).trim(); };
+    function draw() {
+      var line = css('--line-strong') || '#344759', accent = css('--accent') || '#f2b04a', faint = css('--faint') || '#8493a1';
+      ctx.clearRect(0, 0, W, H);
+      var mid = H * 0.62, amp = H * 0.24;
+      ctx.lineWidth = 1; ctx.strokeStyle = line; ctx.setLineDash([2, 5]);
+      ctx.beginPath();
+      var k0 = Math.floor(off / bitPx);
+      for (var k = k0; k * bitPx - off < W + bitPx; k++) {
+        var x = Math.round(k * bitPx - off) + 0.5;
+        ctx.moveTo(x, 24); ctx.lineTo(x, H);
+      }
+      ctx.stroke(); ctx.setLineDash([]);
+      ctx.beginPath(); ctx.moveTo(0, Math.round(mid) + 0.5); ctx.lineTo(W, Math.round(mid) + 0.5); ctx.stroke();
+      ctx.fillStyle = faint; ctx.font = '12px "IBM Plex Mono", ui-monospace, monospace'; ctx.textAlign = 'center';
+      for (var j = k0; j * bitPx - off < W + bitPx; j++) {
+        ctx.fillText(String(bits[((j % n) + n) % n]), j * bitPx - off + bitPx / 2, 15);
+      }
+      ctx.strokeStyle = accent; ctx.lineWidth = 1.75; ctx.lineJoin = 'round';
+      ctx.beginPath();
+      for (var px = 0; px <= W; px++) {
+        var y = mid - amp * Math.sin(phaseAt(px + off));
+        if (px === 0) ctx.moveTo(px, y); else ctx.lineTo(px, y);
+      }
+      ctx.stroke();
+    }
+    function size() {
+      var dpr = Math.min(window.devicePixelRatio || 1, 2);
+      W = cv.clientWidth; H = cv.clientHeight;
+      cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      draw();
+    }
+    function tick(t) {
+      if (!last) last = t;
+      off += (t - last) * 0.035; last = t;
+      draw();
+      raf = (visible && !document.hidden) ? requestAnimationFrame(tick) : 0;
+    }
+    function start() { if (!reduce && !raf) { last = 0; raf = requestAnimationFrame(tick); } }
+    size();
+    window.addEventListener('resize', size);
+    if (!reduce) {
+      if ('IntersectionObserver' in window) {
+        new IntersectionObserver(function (e) { visible = e[0].isIntersecting; if (visible) start(); }).observe(cv);
+      }
+      document.addEventListener('visibilitychange', function () { if (!document.hidden) start(); });
+      start();
+    }
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(draw);
+  }
+
+  /* Copy email */
+  var btn = document.getElementById('copy-email'), addr = document.getElementById('email-text'), msg = document.getElementById('copy-msg');
+  if (btn) btn.addEventListener('click', function () {
+    function select() {
+      var r = document.createRange(); r.selectNodeContents(addr);
+      var s = window.getSelection(); s.removeAllRanges(); s.addRange(r);
+      msg.textContent = 'Press Ctrl+C or Cmd+C to copy.';
+    }
+    if (!navigator.clipboard) { select(); return; }
+    navigator.clipboard.writeText(addr.textContent.trim()).then(function () {
+      msg.textContent = 'Email address copied.';
+      setTimeout(function () { msg.textContent = ''; }, 2500);
+    }).catch(select);
+  });
+})();
+</script>
+
+<script>
+(function () {
+  var fig = document.getElementById('viewer');
+  if (!fig) return;
+  var canvas = document.getElementById('inj3d'), hint = document.getElementById('viewer-hint');
+  var BASE = 'https://cdn.jsdelivr.net/npm/three@0.128.0/';
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var coarse = window.matchMedia && window.matchMedia('(pointer: coarse)').matches;
+
+  function loadScript(src) {
+    return new Promise(function (res, rej) {
+      var el = document.createElement('script'); el.src = src; el.onload = res; el.onerror = rej; document.head.appendChild(el);
+    });
+  }
+  function fail() {
+    fig.classList.add('nogl');
+    hint.textContent = 'The 3D view could not load here. Showing a still image.';
+  }
+  var started = false;
+  function start() {
+    if (started) return; started = true;
+    Promise.all([
+      fetch('media/injector-domain.json').then(function (r) { return r.json(); }),
+      loadScript(BASE + 'build/three.min.js').then(function () { return loadScript(BASE + 'examples/js/controls/OrbitControls.js'); })
+    ]).then(function (r) { init(r[0]); }).catch(fail);
+  }
+  if ('IntersectionObserver' in window) {
+    new IntersectionObserver(function (e, o) { if (e[0].isIntersecting) { o.disconnect(); start(); } }, { rootMargin: '500px' }).observe(fig);
+  } else { start(); }
+
+  function init(data) {
+    var THREE = window.THREE, renderer;
+    try { renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true }); } catch (e) { return fail(); }
+    var css = function (n) { return getComputedStyle(document.documentElement).getPropertyValue(n).trim(); };
+    var accent = css('--accent') || '#f2b04a';
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    var scene = new THREE.Scene();
+    var camera = new THREE.PerspectiveCamera(32, 1, 0.5, 3000);
+    var root = new THREE.Group(); root.rotation.x = -Math.PI / 2; scene.add(root); /* file is Z-up */
+
+    var V = data.v, F = data.f, injIdx = [], domIdx = [];
+    for (var i = 0; i < F.length; i += 3) {
+      var mr = 0;
+      for (var k = 0; k < 3; k++) { var vi = F[i + k] * 3; mr = Math.max(mr, Math.hypot(V[vi], V[vi + 1])); }
+      (mr <= 31 ? injIdx : domIdx).push(F[i], F[i + 1], F[i + 2]);
+    }
+
+    /* Non-indexed geometry with normals smoothed across faces closer than 40 degrees */
+    function build(idx) {
+      var nF = idx.length / 3, pos = new Float32Array(nF * 9), nor = new Float32Array(nF * 9);
+      var fn = new Float32Array(nF * 3), area = new Float32Array(nF), adj = {};
+      var f, k, j, c;
+      for (f = 0; f < nF; f++) {
+        var a = idx[f * 3] * 3, b = idx[f * 3 + 1] * 3, cc = idx[f * 3 + 2] * 3;
+        var ux = V[b] - V[a], uy = V[b + 1] - V[a + 1], uz = V[b + 2] - V[a + 2];
+        var vx = V[cc] - V[a], vy = V[cc + 1] - V[a + 1], vz = V[cc + 2] - V[a + 2];
+        var nx = uy * vz - uz * vy, ny = uz * vx - ux * vz, nz = ux * vy - uy * vx, l = Math.hypot(nx, ny, nz) || 1;
+        fn[f * 3] = nx / l; fn[f * 3 + 1] = ny / l; fn[f * 3 + 2] = nz / l; area[f] = l / 2;
+        for (k = 0; k < 3; k++) { var vv = idx[f * 3 + k]; (adj[vv] = adj[vv] || []).push(f); }
+        pos.set([V[a], V[a + 1], V[a + 2], V[b], V[b + 1], V[b + 2], V[cc], V[cc + 1], V[cc + 2]], f * 9);
+      }
+      var cosT = Math.cos(40 * Math.PI / 180);
+      for (f = 0; f < nF; f++) {
+        for (k = 0; k < 3; k++) {
+          var list = adj[idx[f * 3 + k]], sx = 0, sy = 0, sz = 0;
+          for (j = 0; j < list.length; j++) {
+            c = list[j];
+            var d = fn[f * 3] * fn[c * 3] + fn[f * 3 + 1] * fn[c * 3 + 1] + fn[f * 3 + 2] * fn[c * 3 + 2];
+            if (d >= cosT) { sx += fn[c * 3] * area[c]; sy += fn[c * 3 + 1] * area[c]; sz += fn[c * 3 + 2] * area[c]; }
+          }
+          var L = Math.hypot(sx, sy, sz) || 1;
+          nor[f * 9 + k * 3] = sx / L; nor[f * 9 + k * 3 + 1] = sy / L; nor[f * 9 + k * 3 + 2] = sz / L;
+        }
+      }
+      var geo = new THREE.BufferGeometry();
+      geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+      geo.setAttribute('normal', new THREE.BufferAttribute(nor, 3));
+      return geo;
+    }
+
+    var injGeo = build(injIdx), domGeo = build(domIdx);
+    var injMesh = new THREE.Mesh(injGeo, new THREE.MeshStandardMaterial({ color: accent, metalness: 0.1, roughness: 0.55, side: THREE.DoubleSide }));
+    var injEdges = new THREE.LineSegments(new THREE.EdgesGeometry(injGeo, 40), new THREE.LineBasicMaterial({ color: 0x1b1305, transparent: true, opacity: 0.35 }));
+    var domMesh = new THREE.Mesh(domGeo, new THREE.MeshBasicMaterial({ color: 0x7fb4d6, transparent: true, opacity: 0.06, side: THREE.DoubleSide, depthWrite: false }));
+    var domEdges = new THREE.LineSegments(new THREE.EdgesGeometry(domGeo, 25), new THREE.LineBasicMaterial({ color: 0x7fb4d6, transparent: true, opacity: 0.4 }));
+    root.add(domMesh, domEdges, injMesh, injEdges);
+    scene.add(new THREE.HemisphereLight(0xffffff, 0x1a2633, 0.85));
+    var key = new THREE.DirectionalLight(0xffffff, 0.9); key.position.set(1, 2, 1.5); scene.add(key);
+    var fill = new THREE.DirectionalLight(0xbfd8ff, 0.35); fill.position.set(-1.5, 0.5, -1); scene.add(fill);
+    root.updateMatrixWorld(true);
+    var injBox = new THREE.Box3().setFromObject(injMesh), allBox = new THREE.Box3().setFromObject(domMesh).union(injBox);
+
+    var controls = new THREE.OrbitControls(camera, canvas);
+    controls.minDistance = 15; controls.maxDistance = 900;
+    if (controls.listenToKeyEvents) { canvas.tabIndex = 0; controls.listenToKeyEvents(canvas); }
+
+    var views = {}, current = 'injector', moved = false;
+    function fit(box, dir) {
+      var c = box.getCenter(new THREE.Vector3()), r = box.getSize(new THREE.Vector3()).length() / 2;
+      var vf = camera.fov * Math.PI / 180, hf = 2 * Math.atan(Math.tan(vf / 2) * camera.aspect);
+      var dist = r / Math.sin(Math.min(vf, hf) / 2) * 1.02;
+      return { pos: c.clone().add(dir.clone().normalize().multiplyScalar(dist)), target: c };
+    }
+    function computeViews() {
+      views.injector = fit(injBox, new THREE.Vector3(1, 0.75, 1.15));
+      views.domain = fit(allBox, new THREE.Vector3(1.3, 0.8, 1.5));
+    }
+    function render() { renderer.render(scene, camera); }
+    function snap(name) {
+      camera.position.copy(views[name].pos); controls.target.copy(views[name].target); controls.update(); render();
+    }
+    function goTo(name) {
+      current = name;
+      var btns = fig.querySelectorAll('.seg button');
+      for (var b = 0; b < btns.length; b++) btns[b].setAttribute('aria-pressed', btns[b].getAttribute('data-view') === name ? 'true' : 'false');
+      if (reduce) { snap(name); return; }
+      var fromP = camera.position.clone(), fromT = controls.target.clone(), to = views[name], t0 = performance.now(), dur = 650;
+      (function step(now) {
+        var k = Math.min(1, (now - t0) / dur), e = 1 - Math.pow(1 - k, 3);
+        camera.position.lerpVectors(fromP, to.pos, e); controls.target.lerpVectors(fromT, to.target, e);
+        controls.update(); render();
+        if (k < 1) requestAnimationFrame(step);
+      })(t0);
+    }
+
+    controls.addEventListener('change', render);
+    controls.addEventListener('start', function () { moved = true; });
+    fig.querySelectorAll('.seg button').forEach(function (b) { b.addEventListener('click', function () { goTo(b.getAttribute('data-view')); }); });
+    document.getElementById('viewer-reset').addEventListener('click', function () { goTo(current); });
+
+    var ro = new ResizeObserver(function () {
+      var w = canvas.clientWidth, h = canvas.clientHeight;
+      if (!w || !h) return;
+      renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix();
+      computeViews();
+      if (!moved) snap(current); else render();
+    });
+    ro.observe(canvas);
+
+    /* On touch screens, keep page scrolling until the viewer is tapped */
+    if (coarse) {
+      controls.enabled = false;
+      hint.textContent = 'Tap the model, then drag to rotate and pinch to zoom.';
+      canvas.addEventListener('pointerdown', function () {
+        controls.enabled = true; canvas.style.touchAction = 'none'; hint.textContent = 'Drag to rotate. Pinch to zoom.';
+      }, { once: true });
+    } else {
+      canvas.style.touchAction = 'none';
+      hint.textContent = 'Drag to rotate. Scroll to zoom. Right-drag to pan.';
+    }
+    fig.classList.add('ready');
+    var w0 = canvas.clientWidth, h0 = canvas.clientHeight;
+    renderer.setSize(w0, h0, false); camera.aspect = w0 / h0; camera.updateProjectionMatrix(); computeViews(); snap('injector');
+  }
+})();
+</script>
+</body>
+</html>
